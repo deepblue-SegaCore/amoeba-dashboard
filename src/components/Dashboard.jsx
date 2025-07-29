@@ -10,7 +10,10 @@ import RiskMetrics from './RiskMetrics';
 const Dashboard = ({ symbols, apiUrl }) => {
   const [signals, setSignals] = useState([]);
   const [patterns, setPatterns] = useState([]);
-  const { messages, sendMessage, connected } = useWebSocket(`${apiUrl.replace('http', 'ws')}/ws/signals`);
+  
+  // Ensure WebSocket URL is properly constructed
+  const wsUrl = apiUrl ? `${apiUrl.replace('http', 'ws')}/ws/signals` : null;
+  const { messages, sendMessage, connected } = useWebSocket(wsUrl);
   
   useEffect(() => {
     if (connected) {
