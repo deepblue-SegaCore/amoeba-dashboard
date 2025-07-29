@@ -13,6 +13,12 @@ export const useWebSocket = (url) => {
   }, []);
   
   useEffect(() => {
+    // Only create WebSocket connection if URL is provided
+    if (!url) {
+      setConnected(false);
+      return;
+    }
+
     // Create WebSocket connection
     try {
       ws.current = new WebSocket(url);
