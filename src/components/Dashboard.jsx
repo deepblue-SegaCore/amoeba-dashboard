@@ -20,6 +20,54 @@ const Dashboard = ({ symbols = [], apiUrl = '' }) => {
   const wsUrl = apiUrl ? `${apiUrl.replace('http', 'ws')}/ws/signals` : null;
   const { messages, sendMessage, connected } = useWebSocket(wsUrl);
   
+  // Generate fake signals for testing
+  useEffect(() => {
+    const generateFakeSignal = () => {
+      const testSymbols = ['BTCUSD', 'ETHUSD', 'SPY', 'EURUSD'];
+      const randomSymbol = testSymbols[Math.floor(Math.random() * testSymbols.length)];
+      
+      return {
+        id: Date.now() + Math.random(),
+        symbol: randomSymbol,
+        timestamp: new Date().toISOString(),
+        direction: Math.random() > 0.5 ? 'BULLISH' : 'BEARISH',
+        strength: Math.random() * 0.5 + 0.5,
+        confidence: Math.random() * 0.3 + 0.7,
+        environmental_pressure: Math.random() * 2 + 0.5,
+        threshold: 1.8,
+        food_source: {
+          quantity: ['SMALL', 'MEDIUM', 'LARGE'][Math.floor(Math.random() * 3)],
+          quality: ['LOW', 'MEDIUM', 'HIGH'][Math.floor(Math.random() * 3)],
+          sustainability: ['LIMITED', 'MODERATE', 'GOOD', 'EXCELLENT'][Math.floor(Math.random() * 4)],
+          predicted_duration: ['1-3h', '3-6h', '6-12h', '12-24h'][Math.floor(Math.random() * 4)]
+        },
+        outcome: Math.random() > 0.3 ? true : Math.random() > 0.5 ? false : undefined,
+        profit: (Math.random() * 4 - 1).toFixed(2)
+      };
+    };
+    
+    // Generate initial signals
+    const initialSignals = Array(20).fill(null).map(() => generateFakeSignal());
+    setSignals(initialSignals);
+    
+    // Add new signals every 3 seconds
+    const interval = setInterval(() => {
+      setSignals(prev => [generateFakeSignal(), ...prev].slice(0, 100));
+    }, 3000);
+    
+    // Generate fake patterns
+    const fakePattern = {
+      id: Date.now().toString(),
+      symbol: 'BTCUSD',
+      success_probability: Math.random() * 0.3 + 0.5,
+      sample_count: Math.floor(Math.random() * 20) + 1,
+      age_minutes: Math.random() * 95
+    };
+    setPatterns([fakePattern]);
+    
+    return () => clearInterval(interval);
+  }, []);
+
   useEffect(() => {
     if (connected) {
       // Subscribe to symbols when connected
