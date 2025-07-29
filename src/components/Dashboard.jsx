@@ -7,16 +7,14 @@ import LearningMetrics from './LearningMetrics';
 import PositionManager from './PositionManager';
 import RiskMetrics from './RiskMetrics';
 
-const Dashboard = ({ symbols, apiUrl }) => {
+const Dashboard = ({ symbols = [], apiUrl = '' }) => {
+  // Always call hooks in the same order
   const [signals, setSignals] = useState([]);
   const [patterns, setPatterns] = useState([]);
-  const [environmentalData, setEnvironmentalData] = useState(null);
-  const [positions, setPositions] = useState([]);
-  const [riskMetrics, setRiskMetrics] = useState(null);
   const intervalRef = useRef(null);
   
-  // Ensure WebSocket URL is properly constructed
-  const wsUrl = apiUrl ? `${apiUrl.replace('http', 'ws')}/ws/signals` : '';
+  // Construct WebSocket URL consistently
+  const wsUrl = apiUrl ? `${apiUrl.replace('http', 'ws')}/ws/signals` : null;
   const { messages, sendMessage, connected } = useWebSocket(wsUrl);
   
   useEffect(() => {
