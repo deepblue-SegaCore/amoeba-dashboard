@@ -3,7 +3,9 @@ import { useState, useEffect, useRef } from 'react';
 
 export function useWebSocket(url) {
   const [data, setData] = useState(null);
+  const [messages, setMessages] = useState([]);
   const [connectionStatus, setConnectionStatus] = useState('disconnected');
+  const [connected, setConnected] = useState(false);
   const ws = useRef(null);
 
   useEffect(() => {
@@ -13,6 +15,7 @@ export function useWebSocket(url) {
         
         ws.current.onopen = () => {
           setConnectionStatus('connected');
+          setConnected(true);
           console.log('WebSocket connected');
         };
 
@@ -20,6 +23,7 @@ export function useWebSocket(url) {
           try {
             const parsedData = JSON.parse(event.data);
             setData(parsedData);
+            setMessages(prev => [...prev, parsedData]);
           } catch (error) {
             console.error('Error parsing WebSocket message:', error);
           }
@@ -27,6 +31,7 @@ export function useWebSocket(url) {
 
         ws.current.onclose = () => {
           setConnectionStatus('disconnected');
+          setConnected(false);
           console.log('WebSocket disconnected');
           // Attempt to reconnect after 5 seconds
           setTimeout(connectWebSocket, 5000);
@@ -35,6 +40,7 @@ export function useWebSocket(url) {
         ws.current.onerror = (error) => {
           console.error('WebSocket error:', error);
           setConnectionStatus('error');
+          setConnected(false);
         };
       } catch (error) {
         console.error('Error creating WebSocket:', error);
@@ -59,5 +65,5 @@ export function useWebSocket(url) {
     }
   };
 
-  return { data, connectionStatus, sendMessage };
+  return { data, messages, connectionStatus, connected, sendMessage };
 }

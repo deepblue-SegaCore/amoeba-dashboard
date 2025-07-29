@@ -1,7 +1,7 @@
 
 class ApiService {
   constructor(baseUrl = null) {
-    this.API_BASE_URL = baseUrl || process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
+    this.API_BASE_URL = baseUrl || import.meta.env.REACT_APP_API_URL || 'http://localhost:5000/api';
   }
   async request(endpoint, options = {}) {
     const url = `${this.API_BASE_URL}${endpoint}`;
