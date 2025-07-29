@@ -1,52 +1,135 @@
 
 import React from 'react';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { Brain, TrendingUp, Clock } from 'lucide-react';
 
-export default function LearningMetrics({ metrics = {} }) {
-  const {
-    accuracy = 0,
-    adaptationRate = 0,
-    experiencePoints = 0,
-    learningSpeed = 0,
-    memoryUtilization = 0
-  } = metrics;
-
+const LearningMetrics = ({ patterns = [] }) => {
+  // Calculate learning progress over time
+  const learningData = patterns
+    .slice(0, 20)
+    .reverse()
+    .map((pattern, index) => ({
+      index,
+      probability: (pattern.success_probability || 0) * 100,
+      samples: pattern.sample_count || 0,
+      age: pattern.age_minutes?.toFixed(0) || '0'
+    }));
+  
+  const avgSuccessRate = patterns.length > 0
+    ? (patterns.reduce((sum, p) => sum + (p.success_probability || 0), 0) / patterns.length * 100).toFixed(1)
+    : '0';
+  
+  const totalSamples = patterns.reduce((sum, p) => sum + (p.sample_count || 0), 0);
+  
+  // Calculate memory window percentage (0-95 minutes)
+  const oldestPattern = patterns[patterns.length - 1];
+  const memoryPercentage = oldestPattern?.age_minutes 
+    ? Math.min((oldestPattern.age_minutes / 95) * 100, 100)
+    : 0;
+  
   return (
-    <div className="learning-metrics">
-      <h3>Learning Metrics</h3>
-      <div className="metrics-grid">
-        <div className="metric-item">
-          <label>Accuracy</label>
-          <div className="progress-bar">
-            <div 
-              className="progress-fill" 
-              style={{ width: `${accuracy}%` }}
-            ></div>
-          </div>
-          <span>{accuracy}%</span>
+    <div className="card">
+      <h2 className="card-header">
+        <Brain size={24} />
+        Associative Learning Metrics
+      </h2>
+      
+      {/* Key Metrics */}
+      <div className="grid grid-cols-3" style={{ marginBottom: '1rem' }}>
+        <div className="card" style={{ backgroundColor: '#374151', textAlign: 'center', padding: '0.75rem' }}>
+          <Clock size={20} style={{ margin: '0 auto 0.25rem' }} />
+          <div style={{ fontSize: '0.75rem', color: '#9ca3af' }}>Active Patterns</div>
+          <div style={{ fontSize: '1.25rem', fontWeight: 'bold' }}>{patterns.length}</div>
         </div>
-        <div className="metric-item">
-          <label>Adaptation Rate</label>
-          <div className="progress-bar">
-            <div 
-              className="progress-fill" 
-              style={{ width: `${adaptationRate}%` }}
-            ></div>
-          </div>
-          <span>{adaptationRate}%</span>
+        <div className="card" style={{ backgroundColor: '#374151', textAlign: 'center', padding: '0.75rem' }}>
+          <TrendingUp size={20} style={{ margin: '0 auto 0.25rem' }} />
+          <div style={{ fontSize: '0.75rem', color: '#9ca3af' }}>Avg Success</div>
+          <div className="text-green" style={{ fontSize: '1.25rem', fontWeight: 'bold' }}>{avgSuccessRate}%</div>
         </div>
-        <div className="metric-item">
-          <label>Experience Points</label>
-          <span className="value">{experiencePoints.toLocaleString()}</span>
+        <div className="card" style={{ backgroundColor: '#374151', textAlign: 'center', padding: '0.75rem' }}>
+          <Brain size={20} style={{ margin: '0 auto 0.25rem' }} />
+          <div style={{ fontSize: '0.75rem', color: '#9ca3af' }}>Total Samples</div>
+          <div className="text-blue" style={{ fontSize: '1.25rem', fontWeight: 'bold' }}>{totalSamples}</div>
         </div>
-        <div className="metric-item">
-          <label>Learning Speed</label>
-          <span className="value">{learningSpeed}x</span>
+      </div>
+      
+      {/* Learning Progress Chart */}
+      {learningData.length > 0 ? (
+        <div style={{ height: '200px', marginBottom: '1rem' }}>
+          <ResponsiveContainer width="100%" height="100%">
+            <LineChart data={learningData}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+              <XAxis 
+                dataKey="index" 
+                stroke="#9CA3AF"
+                label={{ value: 'Pattern Age', position: 'insideBottom', offset: -5 }}
+              />
+              <YAxis 
+                stroke="#9CA3AF"
+                label={{ value: 'Success %', angle: -90, position: 'insideLeft' }}
+              />
+              <Tooltip 
+                contentStyle={{ backgroundColor: '#1F2937', border: 'none' }}
+                labelFormatter={(value) => `Pattern ${value}`}
+              />
+              <Line 
+                type="monotone" 
+                dataKey="probability" 
+                stroke="#10B981" 
+                strokeWidth={2}
+                dot={{ fill: '#10B981', r: 4 }}
+                name="Success Rate"
+              />
+            </LineChart>
+          </ResponsiveContainer>
         </div>
-        <div className="metric-item">
-          <label>Memory Usage</label>
-          <span className="value">{memoryUtilization}%</span>
+      ) : (
+        <div style={{ 
+          height: '200px', 
+          display: 'flex', 
+          alignItems: 'center', 
+          justifyContent: 'center',
+          color: '#6b7280'
+        }}>
+          No pattern data yet
+        </div>
+      )}
+      
+      {/* Memory Window Indicator */}
+      <div>
+        <div style={{ fontSize: '0.875rem', color: '#9ca3af', marginBottom: '0.25rem' }}>
+          Memory Window Status
+        </div>
+        <div style={{ 
+          backgroundColor: '#374151', 
+          borderRadius: '9999px', 
+          height: '0.5rem',
+          overflow: 'hidden'
+        }}>
+          <div 
+            style={{ 
+              background: 'linear-gradient(to right, #10b981, #f59e0b, #ef4444)',
+              height: '100%',
+              borderRadius: '9999px',
+              transition: 'width 1s ease-out',
+              width: `${memoryPercentage}%`
+            }}
+          />
+        </div>
+        <div style={{ 
+          display: 'flex', 
+          justifyContent: 'space-between',
+          fontSize: '0.75rem',
+          color: '#6b7280',
+          marginTop: '0.25rem'
+        }}>
+          <span>0 min</span>
+          <span>47.5 min</span>
+          <span>95 min (expiry)</span>
         </div>
       </div>
     </div>
   );
-}
+};
+
+export default LearningMetrics;
