@@ -11,6 +11,9 @@ const Dashboard = ({ symbols = [], apiUrl = '' }) => {
   // Always call hooks in the same order
   const [signals, setSignals] = useState([]);
   const [patterns, setPatterns] = useState([]);
+  const [environmentalData, setEnvironmentalData] = useState(null);
+  const [positions, setPositions] = useState([]);
+  const [riskMetrics, setRiskMetrics] = useState(null);
   const intervalRef = useRef(null);
   
   // Construct WebSocket URL consistently
