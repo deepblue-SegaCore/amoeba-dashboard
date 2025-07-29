@@ -1,51 +1,70 @@
 
 import React from 'react';
+import { ResponsiveContainer, RadialBarChart, RadialBar, Cell } from 'recharts';
 
-export default function EnvironmentalPressureGauge({ pressure = 0 }) {
-  const getGaugeColor = (value) => {
-    if (value < 30) return '#4ade80';
-    if (value < 70) return '#facc15';
-    return '#ef4444';
-  };
-
-  const rotation = (pressure / 100) * 180;
-
+const EnvironmentalPressureGauge = ({ pressure, threshold }) => {
+  const percentage = Math.min((pressure / threshold) * 100, 150);
+  
+  const data = [
+    { name: 'background', value: 100, fill: '#374151' },
+    { name: 'pressure', value: percentage, fill: getPressureColor(pressure, threshold) }
+  ];
+  
+  function getPressureColor(p, t) {
+    const ratio = p / t;
+    if (ratio >= 1.5) return '#ef4444';  // red - Extreme
+    if (ratio >= 1.0) return '#f97316';  // orange - Active
+    if (ratio >= 0.8) return '#f59e0b';  // amber - Building
+    if (ratio >= 0.6) return '#eab308';  // yellow - Watching
+    return '#10b981';  // green - Dormant
+  }
+  
+  function getPressureState(p, t) {
+    const ratio = p / t;
+    if (ratio >= 1.5) return 'EXTREME';
+    if (ratio >= 1.0) return 'ACTIVE';
+    if (ratio >= 0.8) return 'BUILDING';
+    if (ratio >= 0.6) return 'WATCHING';
+    return 'DORMANT';
+  }
+  
   return (
-    <div className="pressure-gauge">
-      <h3>Environmental Pressure</h3>
-      <div className="gauge-container">
-        <svg width="200" height="120" viewBox="0 0 200 120">
-          <path
-            d="M 20 100 A 80 80 0 0 1 180 100"
-            fill="none"
-            stroke="#e5e7eb"
-            strokeWidth="10"
-          />
-          <path
-            d="M 20 100 A 80 80 0 0 1 180 100"
-            fill="none"
-            stroke={getGaugeColor(pressure)}
-            strokeWidth="10"
-            strokeDasharray={`${(pressure / 100) * 251.3} 251.3`}
-            strokeLinecap="round"
-          />
-          <circle cx="100" cy="100" r="5" fill="#374151" />
-          <line
-            x1="100"
-            y1="100"
-            x2="100"
-            y2="30"
-            stroke="#374151"
-            strokeWidth="3"
-            strokeLinecap="round"
-            transform={`rotate(${rotation - 90} 100 100)`}
-          />
-        </svg>
-        <div className="gauge-value">
-          <span className="pressure-value">{pressure.toFixed(1)}</span>
-          <span className="pressure-unit">%</span>
+    <div style={{ position: 'relative', height: '120px' }}>
+      <ResponsiveContainer width="100%" height="100%">
+        <RadialBarChart 
+          cx="50%" 
+          cy="50%" 
+          innerRadius="60%" 
+          outerRadius="90%" 
+          data={data} 
+          startAngle={180} 
+          endAngle={0}
+        >
+          <RadialBar dataKey="value" cornerRadius={10}>
+            {data.map((entry, index) => (
+              <Cell key={`cell-${index}`} fill={entry.fill} />
+            ))}
+          </RadialBar>
+        </RadialBarChart>
+      </ResponsiveContainer>
+      
+      <div style={{
+        position: 'absolute',
+        top: '50%',
+        left: '50%',
+        transform: 'translate(-50%, -50%)',
+        textAlign: 'center',
+        marginTop: '20px'
+      }}>
+        <div style={{ fontSize: '1.5rem', fontWeight: 'bold' }}>
+          {pressure.toFixed(2)}
+        </div>
+        <div style={{ fontSize: '0.75rem', color: '#9ca3af' }}>
+          {getPressureState(pressure, threshold)}
         </div>
       </div>
     </div>
   );
-}
+};
+
+export default EnvironmentalPressureGauge;
