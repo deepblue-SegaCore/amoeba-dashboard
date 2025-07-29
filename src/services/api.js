@@ -1,9 +1,10 @@
 
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8080/api';
-
 class ApiService {
+  constructor(baseUrl = null) {
+    this.API_BASE_URL = baseUrl || process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
+  }
   async request(endpoint, options = {}) {
-    const url = `${API_BASE_URL}${endpoint}`;
+    const url = `${this.API_BASE_URL}${endpoint}`;
     const config = {
       headers: {
         'Content-Type': 'application/json',
@@ -76,4 +77,5 @@ class ApiService {
   }
 }
 
-export default new ApiService();
+export default ApiService;
+export const defaultApiService = new ApiService();

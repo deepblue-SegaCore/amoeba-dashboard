@@ -8,8 +8,10 @@ import RiskMetrics from './RiskMetrics';
 import EnvironmentalPressureGauge from './EnvironmentalPressureGauge';
 import { useWebSocket } from '../hooks/useWebSocket';
 
-export default function Dashboard() {
-  const { data, connectionStatus } = useWebSocket('ws://localhost:8080/ws');
+export default function Dashboard({ symbols = [], apiUrl = 'http://localhost:5000' }) {
+  // Use the apiUrl to construct WebSocket URL
+  const wsUrl = apiUrl.replace('http', 'ws').replace('5000', '8080') + '/ws';
+  const { data, connectionStatus } = useWebSocket(wsUrl);
 
   return (
     <div className="dashboard">

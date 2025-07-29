@@ -1,12 +1,23 @@
 
 import React from 'react';
-import Dashboard from './components/Dashboard';
 import './App.css';
+import Dashboard from './components/Dashboard';
 
-export default function App() {
+function App() {
+  // Configure your trading symbols here
+  const symbols = ['BTCUSD', 'ETHUSD', 'SPY', 'EURUSD'];
+  
+  // API URL - update this for production
+  const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+  
   return (
     <div className="App">
-      <Dashboard />
+      <Dashboard 
+        symbols={symbols} 
+        apiUrl={apiUrl}
+      />
     </div>
   );
 }
+
+export default App;
