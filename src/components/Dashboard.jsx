@@ -1,5 +1,5 @@
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useWebSocket } from '../hooks/useWebSocket';
 import EnvironmentalStatus from './EnvironmentalStatus';
 import SignalHistory from './SignalHistory';
@@ -10,9 +10,13 @@ import RiskMetrics from './RiskMetrics';
 const Dashboard = ({ symbols, apiUrl }) => {
   const [signals, setSignals] = useState([]);
   const [patterns, setPatterns] = useState([]);
+  const [environmentalData, setEnvironmentalData] = useState(null);
+  const [positions, setPositions] = useState([]);
+  const [riskMetrics, setRiskMetrics] = useState(null);
+  const intervalRef = useRef(null);
   
   // Ensure WebSocket URL is properly constructed
-  const wsUrl = apiUrl ? `${apiUrl.replace('http', 'ws')}/ws/signals` : null;
+  const wsUrl = apiUrl ? `${apiUrl.replace('http', 'ws')}/ws/signals` : '';
   const { messages, sendMessage, connected } = useWebSocket(wsUrl);
   
   useEffect(() => {
