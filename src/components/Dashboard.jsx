@@ -43,9 +43,11 @@ const Dashboard = ({ symbols = [], apiUrl = '' }) => {
     if (messages.length > 0) {
       const latestMessage = messages[messages.length - 1];
 
-      if (latestMessage.type === 'signal') {
+      if (latestMessage.type === 'signal' || latestMessage.type === 'market_update') {
         setSignals(prev => {
-          const newSignals = [latestMessage.data, ...prev];
+          // For market_update messages, the data is directly in the message, not in a data property
+          const signalData = latestMessage.type === 'market_update' ? latestMessage : latestMessage.data;
+          const newSignals = [signalData, ...prev];
           // Keep only last 100 signals
           return newSignals.slice(0, 100);
         });
