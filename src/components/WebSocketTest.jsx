@@ -29,6 +29,23 @@ const WebSocketTest = () => {
         symbols: ['BTCUSD', 'ETHUSD']
       }));
       addResult('📤 Sent subscription message', 'info');
+      
+      // Send a test signal after 2 seconds
+      setTimeout(() => {
+        if (testWs.readyState === WebSocket.OPEN) {
+          const testSignal = {
+            type: 'test_signal',
+            symbol: 'BTCUSD',
+            environmental_pressure: 2.5,
+            threshold: 1.8,
+            volume: 1500000,
+            price: 45000,
+            timestamp: new Date().toISOString()
+          };
+          testWs.send(JSON.stringify(testSignal));
+          addResult('📤 Sent test signal', 'info');
+        }
+      }, 2000);
     };
 
     testWs.onmessage = (event) => {
