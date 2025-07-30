@@ -19,7 +19,7 @@ const Dashboard = ({ symbols = [], apiUrl = '' }) => {
   // Construct WebSocket URL properly
   const wsUrl = apiUrl 
     ? `${apiUrl.replace('https://', 'wss://').replace('http://', 'ws://')}/ws/signals` 
-    : null;
+    : 'wss://953370c5-8baa-49e6-a964-e76807498376-00-26qsx7u0809rl.pike.replit.dev/ws/signals';
   const { messages, sendMessage, connected, reconnect } = useWebSocket(wsUrl);
 
   // Initialize with empty state - data will come from WebSocket

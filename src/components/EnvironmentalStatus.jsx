@@ -70,21 +70,69 @@ const EnvironmentalStatus = ({ signals, symbols }) => {
                     </div>
 
                     <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                      <span>Duration:</span>
-                      <span className="text-blue" style={{ fontWeight: 'bold' }}>
+                      <span>Predicted Duration:</span>
+                      <span style={{ fontWeight: 'bold' }}>
                         {signal.food_source?.predicted_duration || '—'}
                       </span>
                     </div>
                   </div>
+
+                  <div className="learning-recommendation" style={{
+                    marginTop: '0.5rem',
+                    fontSize: '0.75rem',
+                    fontStyle: 'italic',
+                    color: '#9ca3af',
+                    textAlign: 'center'
+                  }}>
+                    {signal.learning_recommendation || ''}
+                  </div>
                 </>
               ) : (
-                <div style={{ 
-                  textAlign: 'center', 
-                  color: '#6b7280',
-                  padding: '2rem 0'
-                }}>
-                  Waiting for signals...
-                </div>
+                <>
+                  <div className="pressure-value" style={{ 
+                    fontSize: '1.25rem', 
+                    fontWeight: 'bold', 
+                    textAlign: 'center',
+                    margin: '0.5rem 0',
+                    color: '#6b7280'
+                  }}>
+                    --
+                  </div>
+
+                  <div className="state" style={{ 
+                    textAlign: 'center',
+                    fontSize: '0.875rem',
+                    color: '#6b7280',
+                    marginBottom: '0.5rem'
+                  }}>
+                    Waiting for signals...
+                  </div>
+
+                  <div className="direction" style={{ 
+                    textAlign: 'center',
+                    fontSize: '0.875rem',
+                    color: '#6b7280',
+                    marginBottom: '0.5rem'
+                  }}>
+                    --
+                  </div>
+
+                  <div className="food-source" style={{
+                    textAlign: 'center',
+                    fontSize: '0.875rem',
+                    color: '#6b7280',
+                    marginBottom: '0.5rem'
+                  }}>
+                    --
+                  </div>
+
+                  <div className="learning-recommendation" style={{
+                    fontSize: '0.75rem',
+                    color: '#6b7280',
+                    textAlign: 'center'
+                  }}>
+                  </div>
+                </>
               )}
             </div>
           );
