@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState, useRef } from 'react';
 import { useWebSocket } from '../hooks/useWebSocket';
 import EnvironmentalStatus from './EnvironmentalStatus';
@@ -16,19 +15,19 @@ const Dashboard = ({ symbols = [], apiUrl = '' }) => {
   const [positions, setPositions] = useState([]);
   const [riskMetrics, setRiskMetrics] = useState(null);
   const intervalRef = useRef(null);
-  
+
   // Construct WebSocket URL properly
   const wsUrl = apiUrl 
     ? `${apiUrl.replace('https://', 'wss://').replace('http://', 'ws://')}/ws/signals` 
     : null;
   const { messages, sendMessage, connected } = useWebSocket(wsUrl);
-  
+
   // Generate fake signals for testing
   useEffect(() => {
     const generateFakeSignal = () => {
       const testSymbols = ['BTCUSD', 'ETHUSD', 'SPY', 'EURUSD'];
       const randomSymbol = testSymbols[Math.floor(Math.random() * testSymbols.length)];
-      
+
       return {
         id: Date.now() + Math.random(),
         symbol: randomSymbol,
@@ -48,16 +47,16 @@ const Dashboard = ({ symbols = [], apiUrl = '' }) => {
         profit: (Math.random() * 4 - 1).toFixed(2)
       };
     };
-    
+
     // Generate initial signals
     const initialSignals = Array(20).fill(null).map(() => generateFakeSignal());
     setSignals(initialSignals);
-    
+
     // Add new signals every 3 seconds
     const interval = setInterval(() => {
       setSignals(prev => [generateFakeSignal(), ...prev].slice(0, 100));
     }, 3000);
-    
+
     // Generate fake patterns
     const fakePattern = {
       id: Date.now().toString(),
@@ -67,7 +66,7 @@ const Dashboard = ({ symbols = [], apiUrl = '' }) => {
       age_minutes: Math.random() * 95
     };
     setPatterns([fakePattern]);
-    
+
     return () => clearInterval(interval);
   }, []);
 
@@ -80,12 +79,12 @@ const Dashboard = ({ symbols = [], apiUrl = '' }) => {
       });
     }
   }, [symbols, connected, sendMessage]);
-  
+
   useEffect(() => {
     // Process incoming WebSocket messages
     if (messages.length > 0) {
       const latestMessage = messages[messages.length - 1];
-      
+
       if (latestMessage.type === 'signal') {
         setSignals(prev => {
           const newSignals = [latestMessage.data, ...prev];
@@ -96,20 +95,20 @@ const Dashboard = ({ symbols = [], apiUrl = '' }) => {
         setPatterns(prev => {
           const updated = [...prev];
           const index = updated.findIndex(p => p.id === latestMessage.data.id);
-          
+
           if (index >= 0) {
             updated[index] = latestMessage.data;
           } else {
             updated.unshift(latestMessage.data);
           }
-          
+
           // Keep only last 50 patterns
           return updated.slice(0, 50);
         });
       }
     }
   }, [messages]);
-  
+
   return (
     <div className="dashboard-container">
       <h1 style={{ 
@@ -123,40 +122,40 @@ const Dashboard = ({ symbols = [], apiUrl = '' }) => {
       }}>
         🦠 Amoeba Trading System - Environmental Intelligence Dashboard
       </h1>
-      
+
       {/* WebSocket Test Component */}
       <div style={{ marginBottom: '1rem' }}>
         <WebSocketTest />
       </div>
-      
+
       {/* Environmental Status - Full Width */}
       <div style={{ marginBottom: '1rem' }}>
         <EnvironmentalStatus signals={signals} symbols={symbols} />
       </div>
-      
+
       {/* Main Grid Layout */}
       <div className="grid grid-cols-2" style={{ gap: '1rem' }}>
         {/* Signal History - Takes 2/3 width on large screens */}
         <div style={{ gridColumn: 'span 2' }}>
           <SignalHistory signals={signals} />
         </div>
-        
+
         {/* Learning Metrics */}
         <div>
           <LearningMetrics patterns={patterns} />
         </div>
-        
+
         {/* Position Manager */}
         <div>
           <PositionManager signals={signals} />
         </div>
-        
+
         {/* Risk Metrics - Takes full width of remaining space */}
         <div style={{ gridColumn: 'span 2' }}>
           <RiskMetrics signals={signals} patterns={patterns} />
         </div>
       </div>
-      
+
       {/* Status Bar */}
       <div style={{ 
         marginTop: '1rem', 
