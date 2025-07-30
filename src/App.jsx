@@ -7,8 +7,8 @@ function App() {
   // Configure your trading symbols here
   const symbols = ['BTCUSD', 'ETHUSD', 'SPY', 'EURUSD'];
   
-  // Your Flask backend URL
-  const apiUrl = 'https://953370c5-8baa-49e6-a964-e76807498376-00-26qsx7u0809rl.pike.replit.dev';
+  // API URL from environment variable
+  const apiUrl = import.meta.env.VITE_REACT_APP_API_URL || 'https://953370c5-8baa-49e6-a964-e76807498376-00-26qsx7u0809rl.pike.replit.dev';
   
   return (
     <div className="App">
