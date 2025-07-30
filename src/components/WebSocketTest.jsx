@@ -1,6 +1,27 @@
 
 import React, { useState } from 'react';
 
+// Determine the WebSocket URL based on environment
+function getWebSocketUrl() {
+  // For local development
+  if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+    return 'ws://localhost:5000/ws/signals';
+  }
+  
+  // For Replit deployment - use the same domain as your backend
+  // Use secure WebSocket connection for HTTPS environments
+  const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+  const host = window.location.hostname;
+  
+  // If we're on Replit, construct the WebSocket URL
+  if (host.includes('replit.dev')) {
+    return 'wss://953370c5-8baa-49e6-a964-e76807498376-00-26qsx7u0809rl.pike.replit.dev/ws/signals';
+  }
+  
+  // Default fallback
+  return `${protocol}//${host}:5000/ws/signals`;
+}
+
 const WebSocketTest = ({ apiUrl }) => {
   const [testResults, setTestResults] = useState([]);
   const [isConnecting, setIsConnecting] = useState(false);
@@ -12,7 +33,7 @@ const WebSocketTest = ({ apiUrl }) => {
     
     const wsUrl = apiUrl 
       ? `${apiUrl.replace('https://', 'wss://').replace('http://', 'ws://')}/ws/signals`
-      : 'wss://953370c5-8baa-49e6-a964-e76807498376-00-26qsx7u0809rl.pike.replit.dev/ws/signals';
+      : getWebSocketUrl();
     
     console.log('🧪 Testing WebSocket connection to:', wsUrl);
     const testWs = new WebSocket(wsUrl);

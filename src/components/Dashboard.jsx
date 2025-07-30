@@ -16,10 +16,10 @@ const Dashboard = ({ symbols = [], apiUrl = '' }) => {
   const [riskMetrics, setRiskMetrics] = useState(null);
   const intervalRef = useRef(null);
 
-  // Construct WebSocket URL properly
+  // Use dynamic WebSocket URL detection - pass null to use auto-detection
   const wsUrl = apiUrl 
     ? `${apiUrl.replace('https://', 'wss://').replace('http://', 'ws://')}/ws/signals` 
-    : 'wss://953370c5-8baa-49e6-a964-e76807498376-00-26qsx7u0809rl.pike.replit.dev/ws/signals';
+    : null; // null triggers auto-detection in useWebSocket hook
   const { messages, sendMessage, connected, reconnect } = useWebSocket(wsUrl);
 
   // Initialize with empty state - data will come from WebSocket

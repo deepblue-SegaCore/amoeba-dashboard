@@ -1,6 +1,27 @@
 
 import { useEffect, useState, useRef, useCallback } from 'react';
 
+// Determine the WebSocket URL based on environment
+function getWebSocketUrl() {
+  // For local development
+  if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+    return 'ws://localhost:5000/ws/signals';
+  }
+  
+  // For Replit deployment - use the same domain as your backend
+  // Use secure WebSocket connection for HTTPS environments
+  const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+  const host = window.location.hostname;
+  
+  // If we're on Replit, construct the WebSocket URL
+  if (host.includes('replit.dev')) {
+    return 'wss://953370c5-8baa-49e6-a964-e76807498376-00-26qsx7u0809rl.pike.replit.dev/ws/signals';
+  }
+  
+  // Default fallback
+  return `${protocol}//${host}:5000/ws/signals`;
+}
+
 export const useWebSocket = (url) => {
   const [messages, setMessages] = useState([]);
   const [connected, setConnected] = useState(false);
@@ -18,12 +39,11 @@ export const useWebSocket = (url) => {
   }, []);
 
   const connectWebSocket = useCallback(() => {
-    if (!url) {
-      setConnected(false);
-      return;
-    }
-
-    console.log('🔌 Connecting to WebSocket...', url);
+    // Use the provided URL or fall back to dynamic detection
+    const wsUrl = url || getWebSocketUrl();
+    
+    console.log('🔌 Connecting to WebSocket...');
+    console.log('WebSocket URL:', wsUrl);
     
     try {
       // Close existing connection if any
@@ -32,7 +52,7 @@ export const useWebSocket = (url) => {
       }
 
       // Create new WebSocket connection
-      ws.current = new WebSocket(url);
+      ws.current = new WebSocket(wsUrl);
       
       ws.current.onopen = () => {
         console.log('✅ WebSocket connected!');
