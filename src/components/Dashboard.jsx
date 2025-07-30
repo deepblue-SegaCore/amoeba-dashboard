@@ -16,8 +16,10 @@ const Dashboard = ({ symbols = [], apiUrl = '' }) => {
   const [riskMetrics, setRiskMetrics] = useState(null);
   const intervalRef = useRef(null);
   
-  // Construct WebSocket URL consistently
-  const wsUrl = apiUrl ? `${apiUrl.replace('http', 'ws')}/ws/signals` : null;
+  // Construct WebSocket URL properly
+  const wsUrl = apiUrl 
+    ? `${apiUrl.replace('https://', 'wss://').replace('http://', 'ws://')}/ws/signals` 
+    : null;
   const { messages, sendMessage, connected } = useWebSocket(wsUrl);
   
   // Generate fake signals for testing
