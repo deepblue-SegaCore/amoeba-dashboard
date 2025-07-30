@@ -6,6 +6,7 @@ import SignalHistory from './SignalHistory';
 import LearningMetrics from './LearningMetrics';
 import PositionManager from './PositionManager';
 import RiskMetrics from './RiskMetrics';
+import WebSocketTest from './WebSocketTest';
 
 const Dashboard = ({ symbols = [], apiUrl = '' }) => {
   // Always call hooks in the same order
@@ -122,6 +123,11 @@ const Dashboard = ({ symbols = [], apiUrl = '' }) => {
       }}>
         🦠 Amoeba Trading System - Environmental Intelligence Dashboard
       </h1>
+      
+      {/* WebSocket Test Component */}
+      <div style={{ marginBottom: '1rem' }}>
+        <WebSocketTest />
+      </div>
       
       {/* Environmental Status - Full Width */}
       <div style={{ marginBottom: '1rem' }}>
