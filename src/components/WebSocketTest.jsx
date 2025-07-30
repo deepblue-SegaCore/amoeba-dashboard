@@ -8,18 +8,20 @@ function getWebSocketUrl() {
     return 'ws://localhost:5000/ws/signals';
   }
   
-  // For Replit deployment - use the same domain as your backend
-  // Use secure WebSocket connection for HTTPS environments
+  // For Replit deployment - use the current window location
+  // This will automatically use the same domain as your frontend
   const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-  const host = window.location.hostname;
+  const host = window.location.host; // includes port if present
   
-  // If we're on Replit, construct the WebSocket URL
+  // If we're on Replit, use the same host but different port for WebSocket
   if (host.includes('replit.dev')) {
-    return 'wss://953370c5-8baa-49e6-a964-e76807498376-00-26qsx7u0809rl.pike.replit.dev/ws/signals';
+    // Use the same hostname but assume backend is on port 5000
+    const hostname = window.location.hostname;
+    return `${protocol}//${hostname}:5000/ws/signals`;
   }
   
-  // Default fallback
-  return `${protocol}//${host}:5000/ws/signals`;
+  // Default fallback - use same host with port 5000
+  return `${protocol}//${window.location.hostname}:5000/ws/signals`;
 }
 
 const WebSocketTest = ({ apiUrl }) => {
