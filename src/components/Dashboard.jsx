@@ -81,6 +81,23 @@ const Dashboard = ({ symbols = [], apiUrl = '' }) => {
         🦠 Amoeba Trading System - Environmental Intelligence Dashboard
       </h1>
 
+      {/* Connection Status Display */}
+      <div className="connection-status" style={{
+        marginBottom: '1rem',
+        padding: '0.5rem 1rem',
+        backgroundColor: '#1f2937',
+        borderRadius: '0.375rem',
+        border: '1px solid #374151',
+        fontSize: '0.875rem'
+      }}>
+        WebSocket: <span id="connection-status" style={{
+          color: connected ? '#10b981' : '#ef4444',
+          fontWeight: 'bold'
+        }}>
+          {connected ? 'Connected' : 'Disconnected'}
+        </span>
+      </div>
+
       {/* WebSocket Test Component */}
       <div style={{ marginBottom: '1rem' }}>
         <WebSocketTest apiUrl={apiUrl} />

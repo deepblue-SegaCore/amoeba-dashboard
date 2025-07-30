@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 const WebSocketTest = ({ apiUrl }) => {
   const [testResults, setTestResults] = useState([]);
   const [isConnecting, setIsConnecting] = useState(false);
+  const [testConnectionStatus, setTestConnectionStatus] = useState('Disconnected');
 
   const testWebSocket = () => {
     setIsConnecting(true);
@@ -25,6 +26,7 @@ const WebSocketTest = ({ apiUrl }) => {
     testWs.onopen = () => {
       addResult('✅ WebSocket Connected!', 'success');
       setIsConnecting(false);
+      setTestConnectionStatus('Connected');
       
       // Send test subscription (matching new format)
       testWs.send(JSON.stringify({
@@ -58,11 +60,13 @@ const WebSocketTest = ({ apiUrl }) => {
     testWs.onerror = (error) => {
       addResult(`❌ WebSocket error: ${error.toString()}`, 'error');
       setIsConnecting(false);
+      setTestConnectionStatus('Error');
     };
     
     testWs.onclose = (event) => {
       addResult(`🔌 Connection closed. Code: ${event.code}, Reason: ${event.reason}`, 'warning');
       setIsConnecting(false);
+      setTestConnectionStatus('Disconnected');
     };
     
     // Auto-close after 10 seconds for testing
@@ -78,6 +82,23 @@ const WebSocketTest = ({ apiUrl }) => {
     <div className="card">
       <div className="card-header">
         🧪 WebSocket Connection Test
+      </div>
+      
+      <div className="connection-status" style={{
+        marginBottom: '1rem',
+        padding: '0.5rem',
+        backgroundColor: '#111827',
+        borderRadius: '0.25rem',
+        fontSize: '0.875rem',
+        textAlign: 'center'
+      }}>
+        Test WebSocket: <span id="test-connection-status" style={{
+          color: testConnectionStatus === 'Connected' ? '#10b981' : 
+                testConnectionStatus === 'Error' ? '#ef4444' : '#6b7280',
+          fontWeight: 'bold'
+        }}>
+          {testConnectionStatus}
+        </span>
       </div>
       
       <button 
