@@ -20,7 +20,7 @@ const Dashboard = ({ symbols = [], apiUrl = '' }) => {
   const wsUrl = apiUrl 
     ? `${apiUrl.replace('https://', 'wss://').replace('http://', 'ws://')}/ws/signals` 
     : null;
-  const { messages, sendMessage, connected } = useWebSocket(wsUrl);
+  const { messages, sendMessage, connected, reconnect } = useWebSocket(wsUrl);
 
   // Initialize with empty state - data will come from WebSocket
   useEffect(() => {
@@ -30,10 +30,10 @@ const Dashboard = ({ symbols = [], apiUrl = '' }) => {
 
   useEffect(() => {
     if (connected) {
-      // Subscribe to symbols when connected
+      // Subscribe to symbols when connected (using enhanced symbol list)
       sendMessage({
         action: 'subscribe',
-        symbols: symbols
+        symbols: ['BTCUSD', 'ETHUSD', 'SOLUSD', 'BNBUSD']
       });
     }
   }, [symbols, connected, sendMessage]);
@@ -119,14 +119,36 @@ const Dashboard = ({ symbols = [], apiUrl = '' }) => {
         marginTop: '1rem', 
         textAlign: 'center', 
         fontSize: '0.875rem',
-        color: '#9ca3af'
+        color: '#9ca3af',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: '1rem'
       }}>
-        Connection: {connected ? 
-          <span className="text-green">🟢 Connected</span> : 
-          <span className="text-red">🔴 Disconnected</span>
-        } | 
-        Memory Window: 95 minutes | 
-        Biological Accuracy: 95%
+        <span>
+          Connection: {connected ? 
+            <span className="text-green">🟢 Connected</span> : 
+            <span className="text-red">🔴 Disconnected</span>
+          }
+        </span>
+        {!connected && (
+          <button 
+            onClick={reconnect}
+            style={{
+              backgroundColor: '#3b82f6',
+              color: 'white',
+              border: 'none',
+              padding: '0.25rem 0.5rem',
+              borderRadius: '0.25rem',
+              cursor: 'pointer',
+              fontSize: '0.75rem'
+            }}
+          >
+            🔄 Reconnect
+          </button>
+        )}
+        <span>Memory Window: 95 minutes</span>
+        <span>Biological Accuracy: 95%</span>
       </div>
     </div>
   );

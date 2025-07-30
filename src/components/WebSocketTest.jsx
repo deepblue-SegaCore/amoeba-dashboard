@@ -13,6 +13,7 @@ const WebSocketTest = ({ apiUrl }) => {
       ? `${apiUrl.replace('https://', 'wss://').replace('http://', 'ws://')}/ws/signals`
       : 'wss://953370c5-8baa-49e6-a964-e76807498376-00-26qsx7u0809rl.pike.replit.dev/ws/signals';
     
+    console.log('🧪 Testing WebSocket connection to:', wsUrl);
     const testWs = new WebSocket(wsUrl);
     
     const addResult = (message, type = 'info') => {
@@ -25,10 +26,10 @@ const WebSocketTest = ({ apiUrl }) => {
       addResult('✅ WebSocket Connected!', 'success');
       setIsConnecting(false);
       
-      // Send test subscription
+      // Send test subscription (matching new format)
       testWs.send(JSON.stringify({
         action: 'subscribe',
-        symbols: ['BTCUSD', 'ETHUSD']
+        symbols: ['BTCUSD', 'ETHUSD', 'SOLUSD', 'BNBUSD']
       }));
       addResult('📤 Sent subscription message', 'info');
       
