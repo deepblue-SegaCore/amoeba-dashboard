@@ -83,7 +83,7 @@ const Dashboard = ({ symbols = [], apiUrl = '' }) => {
 
       {/* WebSocket Test Component */}
       <div style={{ marginBottom: '1rem' }}>
-        <WebSocketTest />
+        <WebSocketTest apiUrl={apiUrl} />
       </div>
 
       {/* Environmental Status - Full Width */}

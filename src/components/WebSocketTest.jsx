@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 
-const WebSocketTest = () => {
+const WebSocketTest = ({ apiUrl }) => {
   const [testResults, setTestResults] = useState([]);
   const [isConnecting, setIsConnecting] = useState(false);
 
@@ -9,7 +9,9 @@ const WebSocketTest = () => {
     setIsConnecting(true);
     setTestResults([]);
     
-    const wsUrl = 'wss://953370c5-8baa-49e6-a964-e76807498376-00-26qsx7u0809rl.pike.replit.dev/ws/signals';
+    const wsUrl = apiUrl 
+      ? `${apiUrl.replace('https://', 'wss://').replace('http://', 'ws://')}/ws/signals`
+      : 'wss://953370c5-8baa-49e6-a964-e76807498376-00-26qsx7u0809rl.pike.replit.dev/ws/signals';
     
     const testWs = new WebSocket(wsUrl);
     
