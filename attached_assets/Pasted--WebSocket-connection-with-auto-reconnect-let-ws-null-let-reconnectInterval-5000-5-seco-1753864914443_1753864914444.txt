@@ -1,0 +1,114 @@
+// WebSocket connection with auto-reconnect
+let ws = null;
+let reconnectInterval = 5000; // 5 seconds
+
+function connectWebSocket() {
+    console.log('🔌 Connecting to WebSocket...');
+    
+    // Use wss:// for secure connection (required for Replit)
+    ws = new WebSocket('wss://953370c5-8baa-49e6-a964-e76807498376-00-26qsx7u0809rl.pike.replit.dev/ws/signals');
+    
+    ws.onopen = () => {
+        console.log('✅ WebSocket connected!');
+        document.getElementById('connection-status').textContent = 'Connected';
+        
+        // Send initial message
+        ws.send(JSON.stringify({ action: 'subscribe', symbols: ['BTCUSD', 'ETHUSD', 'SOLUSD', 'BNBUSD'] }));
+    };
+    
+    ws.onmessage = (event) => {
+        try {
+            const data = JSON.parse(event.data);
+            console.log('📨 Received:', data);
+            
+            if (data.type === 'market_update') {
+                updateSymbolCard(data);
+            }
+        } catch (error) {
+            console.error('Error parsing message:', error);
+        }
+    };
+    
+    ws.onerror = (error) => {
+        console.error('❌ WebSocket error:', error);
+    };
+    
+    ws.onclose = () => {
+        console.log('🔌 WebSocket disconnected. Reconnecting...');
+        setTimeout(connectWebSocket, reconnectInterval);
+    };
+}
+
+// Update symbol card with new data
+function updateSymbolCard(data) {
+    const symbol = data.symbol;
+    const card = document.querySelector(`[data-symbol="${symbol}"]`);
+    
+    if (card) {
+        // Update pressure gauge
+        const pressureElement = card.querySelector('.pressure-value');
+        if (pressureElement) {
+            pressureElement.textContent = data.environmental_pressure.toFixed(2);
+        }
+        
+        // Update state
+        const stateElement = card.querySelector('.state');
+        if (stateElement) {
+            const state = data.environmental_pressure >= data.threshold ? 'ACTIVE' : 
+                         data.environmental_pressure >= data.threshold * 0.8 ? 'BUILDING' :
+                         data.environmental_pressure >= data.threshold * 0.6 ? 'WATCHING' : 'DORMANT';
+            stateElement.textContent = state;
+        }
+        
+        // Update direction
+        const directionElement = card.querySelector('.direction');
+        if (directionElement) {
+            directionElement.textContent = data.direction;
+            directionElement.className = `direction ${data.direction.toLowerCase()}`;
+        }
+        
+        // Update food source
+        const foodSourceElement = card.querySelector('.food-source');
+        if (foodSourceElement && data.food_source) {
+            foodSourceElement.innerHTML = `
+                <div class="food-score">Score: ${data.food_source.score}/10</div>
+                <div class="food-grade">${data.food_source.grade}</div>
+                <div class="food-details">
+                    ${data.food_source.quantity} / ${data.food_source.quality}
+                </div>
+                <div class="sustainability">${data.food_source.sustainability}</div>
+                <div class="duration">${data.food_source.predicted_duration}</div>
+            `;
+        }
+        
+        // Update learning recommendation
+        if (data.pattern_learning) {
+            const learningElement = card.querySelector('.learning-recommendation');
+            if (learningElement) {
+                learningElement.textContent = data.pattern_learning.recommendation;
+            }
+        }
+        
+        // Remove "Waiting for signals..." text
+        const waitingText = card.querySelector('.waiting-text');
+        if (waitingText) {
+            waitingText.style.display = 'none';
+        }
+    }
+}
+
+// Test WebSocket connection button
+document.getElementById('test-websocket')?.addEventListener('click', () => {
+    if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.send(JSON.stringify({ action: 'test', message: 'Hello from dashboard!' }));
+        console.log('📤 Test message sent');
+    } else {
+        console.log('❌ WebSocket not connected');
+        connectWebSocket();
+    }
+});
+
+// Start WebSocket connection when page loads
+document.addEventListener('DOMContentLoaded', () => {
+    connectWebSocket();
+});
